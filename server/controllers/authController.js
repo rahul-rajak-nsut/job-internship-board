@@ -12,6 +12,8 @@ const generateToken = ( userId , role)=>{
 
 };
 
+
+
 // @route  POST /api/auth/register
 const register = async (req, res) => {
   try {
