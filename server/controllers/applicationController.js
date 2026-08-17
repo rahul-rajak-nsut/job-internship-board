@@ -74,5 +74,34 @@ const getApplicationsForJob = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+const updateApplicationStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
 
-module.exports = { applyToJob, getMyApplications, getApplicationsForJob };
+    const validStatuses = ['pending', 'shortlisted', 'rejected', 'accepted'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid status value' });
+    }
+
+    // Step 1: find the application, and pull in its related job
+    const application = await Application.findById(req.params.id).populate('job');
+
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+
+    // Step 2: ownership check — through the job, not directly on the application
+    if (application.job.postedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to update this application' });
+    }
+
+    application.status = status;
+    await application.save();
+
+    res.status(200).json(application);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+module.exports = { applyToJob, getMyApplications, getApplicationsForJob , updateApplicationStatus };

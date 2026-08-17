@@ -3,10 +3,12 @@ const router = express.Router();
 const {
   applyToJob,
   getMyApplications,
-  getApplicationsForJob
+  getApplicationsForJob,
+  updateApplicationStatus
 } = require('../controllers/applicationController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
+
 const upload = require('../middleware/upload');
 
 // Applicant applies to a job — protect, must be applicant, Multer handles the file
@@ -16,6 +18,12 @@ router.post(
   authorizeRoles('applicant'),
   upload.single('resume'),
   applyToJob
+);
+router.put(
+  '/:id/status',
+  protect,
+  authorizeRoles('recruiter'),
+  updateApplicationStatus
 );
 
 // Applicant views their own applications
