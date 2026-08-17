@@ -28,8 +28,39 @@ const createJob = async (req, res) => {
 // @route  GET /api/jobs   (public — no auth needed)
 const getAllJobs = async (req, res) => {
   try {
-    const jobs = await Job.find().populate('postedBy', 'name companyName');
-    res.status(200).json(jobs);
+    const { location, type, minSalary, maxSalary, page, limit } = req.query;
+
+    const filter = {};
+
+    if (location) {
+      filter.location = { $regex: location, $options: 'i' };
+    }
+    if (type) {
+      filter.type = type;
+    }
+    if (minSalary || maxSalary) {
+      filter.salary = {};
+      if (minSalary) filter.salary.$gte = Number(minSalary);
+      if (maxSalary) filter.salary.$lte = Number(maxSalary);
+    }
+
+    const currentPage = Number(page) || 1;
+    const pageLimit = Number(limit) || 10;
+    const skip = (currentPage - 1) * pageLimit;
+
+    const jobs = await Job.find(filter)
+      .populate('postedBy', 'name companyName')
+      .skip(skip)
+      .limit(pageLimit);
+
+    const totalJobs = await Job.countDocuments(filter);
+
+    res.status(200).json({
+      jobs,
+      currentPage,
+      totalPages: Math.ceil(totalJobs / pageLimit),
+      totalJobs
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -38,6 +69,7 @@ const getAllJobs = async (req, res) => {
 // @route  GET /api/jobs/my-jobs   (recruiter only)
 const getMyJobs = async (req, res) => {
   try {
+    
     const jobs = await Job.find({ postedBy: req.user._id });
     res.status(200).json(jobs);
   } catch (error) {
