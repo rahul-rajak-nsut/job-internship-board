@@ -1,30 +1,31 @@
-import { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import api from '@/lib/api';
+import { useState, useEffect } from "react";
+import Navbar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import api from "@/lib/api";
+import { Link } from 'react-router-dom';
 
 function RecruiterDashboard() {
   const [jobs, setJobs] = useState([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [company, setCompany] = useState('');
-  const [location, setLocation] = useState('');
-  const [type, setType] = useState('full-time');
-  const [salary, setSalary] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [company, setCompany] = useState("");
+  const [location, setLocation] = useState("");
+  const [type, setType] = useState("full-time");
+  const [salary, setSalary] = useState("");
   const [posting, setPosting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const fetchMyJobs = async () => {
     try {
-      const response = await api.get('/jobs/my-jobs');
+      const response = await api.get("/jobs/my-jobs");
       setJobs(response.data);
     } catch (err) {
-      console.error('Failed to fetch jobs', err);
+      console.error("Failed to fetch jobs", err);
     } finally {
       setLoadingJobs(false);
     }
@@ -36,11 +37,11 @@ function RecruiterDashboard() {
 
   const handlePostJob = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setPosting(true);
 
     try {
-      await api.post('/jobs', {
+      await api.post("/jobs", {
         title,
         description,
         company,
@@ -50,16 +51,16 @@ function RecruiterDashboard() {
       });
 
       // Clear the form
-      setTitle('');
-      setDescription('');
-      setCompany('');
-      setLocation('');
-      setSalary('');
+      setTitle("");
+      setDescription("");
+      setCompany("");
+      setLocation("");
+      setSalary("");
 
       // Refresh the job list to show the new one
       fetchMyJobs();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to post job');
+      setError(err.response?.data?.message || "Failed to post job");
     } finally {
       setPosting(false);
     }
@@ -69,7 +70,6 @@ function RecruiterDashboard() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="max-w-4xl mx-auto p-8 space-y-8">
-
         {/* Post a job form */}
         <Card className="rounded-2xl shadow-sm border-0">
           <CardHeader>
@@ -80,23 +80,43 @@ function RecruiterDashboard() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Title</Label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} required className="rounded-xl" />
+                  <Input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                    className="rounded-xl"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Company</Label>
-                  <Input value={company} onChange={(e) => setCompany(e.target.value)} required className="rounded-xl" />
+                  <Input
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    required
+                    className="rounded-xl"
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label>Description</Label>
-                <Input value={description} onChange={(e) => setDescription(e.target.value)} required className="rounded-xl" />
+                <Input
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                  className="rounded-xl"
+                />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label>Location</Label>
-                  <Input value={location} onChange={(e) => setLocation(e.target.value)} required className="rounded-xl" />
+                  <Input
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    required
+                    className="rounded-xl"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Type</Label>
@@ -113,14 +133,24 @@ function RecruiterDashboard() {
                 </div>
                 <div className="space-y-2">
                   <Label>Salary</Label>
-                  <Input type="number" value={salary} onChange={(e) => setSalary(e.target.value)} required className="rounded-xl" />
+                  <Input
+                    type="number"
+                    value={salary}
+                    onChange={(e) => setSalary(e.target.value)}
+                    required
+                    className="rounded-xl"
+                  />
                 </div>
               </div>
 
               {error && <p className="text-sm text-red-500">{error}</p>}
 
-              <Button type="submit" disabled={posting} className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
-                {posting ? 'Posting...' : 'Post Job'}
+              <Button
+                type="submit"
+                disabled={posting}
+                className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+              >
+                {posting ? "Posting..." : "Post Job"}
               </Button>
             </form>
           </CardContent>
@@ -141,15 +171,22 @@ function RecruiterDashboard() {
                     <div>
                       <h3 className="font-semibold">{job.title}</h3>
                       <p className="text-sm text-gray-500">
-                        {job.company} · {job.location} · {job.type} · ₹{job.salary.toLocaleString()}
+                        {job.company} · {job.location} · {job.type} · ₹
+                        {job.salary.toLocaleString()}
                       </p>
                     </div>
+                    <Link to={`/recruiter/jobs/${job._id}/applicants`}>
+                      <Button variant="outline" className="rounded-xl">
+                        View Applicants
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
               ))}
             </div>
           )}
         </div>
+        
       </div>
     </div>
   );
